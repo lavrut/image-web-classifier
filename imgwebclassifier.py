@@ -27,6 +27,10 @@ categories = weights.meta["categories"]
 # Get ImageNet class categories from the weights metadata
 categories = weights.meta["categories"]
 
+# # Testing purposes, can remove
+# print("Categories length:", len(categories))
+# print("Sample category:", categories[0])
+
 # Transformations for the input image
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
