@@ -44,10 +44,16 @@ def predict_image(image_bytes):
             outputs = model(img)
             _, predicted = outputs.max(1)
         class_id = predicted.item()
-        # Map the class ID to its corresponding label
-        class_label = categories[class_id]
+        print("Predicted class index:", class_id)  # Debug print
+        # Ensure the index is within the range of categories
+        if class_id < len(categories):
+            class_label = categories[class_id]
+        else:
+            class_label = "Unknown"
+        print("Mapped label:", class_label)  # Debug print
         return class_id, class_label
     except Exception as e:
+        print("Error in predict_image:", e)
         return str(e)
 
 # Check if the file has the correct extension
