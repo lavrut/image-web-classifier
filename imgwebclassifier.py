@@ -60,17 +60,6 @@ def predict_image(image_bytes):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Predict the class of an image
-def predict_image(image_bytes):
-    try:
-        img = Image.open(BytesIO(image_bytes)).convert('RGB')
-        img = transform(img).unsqueeze(0)  # Add batch dimension
-        with torch.no_grad():
-            outputs = model(img)
-            _, predicted = outputs.max(1)
-        return predicted.item()
-    except Exception as e:
-        return str(e)
 
 # Upload endpoint for file submission
 @app.route('/upload', methods=['POST'])
@@ -89,12 +78,17 @@ def upload_file():
     if file and allowed_file(file.filename):
         try:
             file_bytes = file.read()
-            class_id = predict_image(file_bytes)
-            return jsonify({"class_id": class_id}), 200
+            result = predict_image(file_bytes)
+            print("Prediction result:", result)  # Debug print
+
+        # Check if result is a tuple containing both values
+            if isinstance(result, tuple):
+                class_id, class_label = result
+                return jsonify({"class_id": class_id, "class_label": class_label}), 200
+            else:
+                return jsonify({"error": result}), 500
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-    else:
-        return jsonify({"error": "Allowed file types are .png, .jpeg, .jpg"}), 400
     
 # New route serving an HTML form with display logic
 @app.route('/upload_form')
