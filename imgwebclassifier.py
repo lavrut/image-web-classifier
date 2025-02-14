@@ -91,23 +91,61 @@ def upload_file():
     else:
         return jsonify({"error": "Allowed file types are .png, .jpeg, .jpg"}), 400
     
+# New route serving an HTML form with display logic
 @app.route('/upload_form')
-# test with URL -> http://127.0.0.1:5000/upload_form
 def upload_form():
     return '''
     <!doctype html>
     <html lang="en">
-      <head>
+    <head>
         <meta charset="utf-8">
-        <title>Image Upload</title>
-      </head>
-      <body>
+        <title>Image Upload for Classification</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 2rem; }
+            #result { margin-top: 1rem; }
+        </style>
+    </head>
+    <body>
         <h1>Upload an Image for Classification</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-          <input type="file" name="file" accept="image/png, image/jpeg, image/jpg">
-          <input type="submit" value="Upload">
+        <form id="uploadForm">
+            <input type="file" name="file" accept="image/png, image/jpeg, image/jpg" required>
+            <input type="submit" value="Upload">
         </form>
-      </body>
+        <div id="result"></div>
+        
+        <script>
+            document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission (page refresh)
+
+                // Create a FormData object from the form
+                const formData = new FormData();
+                const fileField = document.querySelector('input[type="file"]');
+                formData.append('file', fileField.files[0]);
+
+                try {
+                    // POST the image to the /upload endpoint
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const resultDiv = document.getElementById('result');
+                    // If the response is successful, display the classification results
+                    if (response.ok) {
+                        const data = await response.json();
+                        resultDiv.innerHTML = `<p><strong>Class ID:</strong> ${data.class_id}</p>
+                                               <p><strong>Class Label:</strong> ${data.class_label}</p>`;
+                    } else {
+                        // Display error message if response is not OK
+                        const errorData = await response.json();
+                        resultDiv.innerHTML = `<p style="color: red;">Error: ${errorData.error}</p>`;
+                    }
+                } catch (error) {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">Unexpected Error: ${error}</p>`;
+                }
+            });
+        </script>
+    </body>
     </html>
     '''
 
