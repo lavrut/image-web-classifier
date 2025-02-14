@@ -5,6 +5,7 @@ import torch
 from torchvision import models, transforms
 from torchvision.models import resnet18, ResNet18_Weights
 from flask import Flask, request, jsonify
+from flask import render_template
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -92,6 +93,9 @@ def upload_file():
     
 # New route serving an HTML form with display logic
 @app.route('/upload_form')
+def upload_form():
+    return render_template('upload_form.html')
+
 def upload_form():
     return '''
     <!doctype html>
