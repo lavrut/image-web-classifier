@@ -20,16 +20,11 @@ model.eval()
 weights = ResNet18_Weights.DEFAULT
 categories = weights.meta["categories"]
 
-# Test, can remove
-# label = categories[717]
-# print(label)  # This will print the human-readable label for class 717.
-
-# Get ImageNet class categories from the weights metadata
-categories = weights.meta["categories"]
-
-# # Testing purposes, can remove
-# print("Categories length:", len(categories))
-# print("Sample category:", categories[0])
+# Debugging category label, can remove
+weights = ResNet18_Weights.DEFAULT
+categories = weights.meta.get("categories")
+print("Categories loaded:", categories is not None, "Length:", len(categories) if categories else "N/A")
+print("Sample category:", categories[0])
 
 # Transformations for the input image
 transform = transforms.Compose([
